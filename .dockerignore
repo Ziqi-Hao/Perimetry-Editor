@@ -1,0 +1,14 @@
+data/images/*
+data/extracted/*
+!data/images/.gitkeep
+!data/extracted/.gitkeep
+.git
+.gitignore
+.venv
+.env
+__pycache__/
+*.pyc
+.idea/
+.vscode/
+*.swp
+.DS_Store

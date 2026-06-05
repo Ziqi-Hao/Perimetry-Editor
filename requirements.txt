@@ -1,0 +1,3 @@
+# Tool runs on Python's stdlib only — http.server, email, csv, json, re, os.
+# This file exists so PaaS providers that auto-detect Python projects don't
+# fall back to a default older interpreter or install spurious dependencies.

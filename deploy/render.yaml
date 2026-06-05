@@ -1,0 +1,20 @@
+# Render.com Blueprint — deploy with: ``render deploy`` or via the Dashboard
+# Workflow: push this repo to GitHub, then "New +" → "Blueprint" on Render.
+services:
+  - type: web
+    name: hfa-td-editor
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    # $PORT is injected by Render; we honour it via the PORT env var in
+    # ``server.py``. /health is what their health-check pings.
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: "8766"
+      - key: DATA_DIR
+        value: /var/data
+    disk:
+      name: hfa-td-editor-data
+      mountPath: /var/data
+      sizeGB: 1
