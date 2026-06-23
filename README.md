@@ -166,7 +166,10 @@ patient_007,OD,,,4,8,21,-3,21.21,IT,-4
 
 ## ☁️ Deploy
 
-Three free-tier-friendly platforms are pre-templated in [`deploy/`](deploy/).
+Three free-tier-friendly platforms are templated: Render reads
+[`render.yaml`](render.yaml) at the repo root (so the Blueprint and the
+one-click button work with no extra config); the Fly.io and Railway templates
+live in [`deploy/`](deploy/).
 
 | Platform | One-click? | Persistent disk | Notes |
 | :--- | :-: | :--- | :--- |
@@ -184,9 +187,9 @@ See [`README.md` → Deployment](#deploy) for the exact commands.
 # 2. on Render: New + → Blueprint → point at the repo → done
 ```
 
-Render reads [`deploy/render.yaml`](deploy/render.yaml), builds the Docker
+Render reads [`render.yaml`](render.yaml) at the repo root, builds the Docker
 image, attaches the persistent disk, and gives you
-`https://<service>.onrender.com`.
+`https://<service>.onrender.com`. (Blueprint Path can be left at its default.)
 
 ### Fly.io (Montreal region default)
 
