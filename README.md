@@ -29,12 +29,14 @@ instead of ~10 min.
 
 |  |  |
 | :--- | :--- |
-| 🔍&nbsp; **Side-by-side** | Zoomable Humphrey report on the left, editable colour-coded 24-2 grid on the right. |
-| 💾&nbsp; **Auto-save** | Every keystroke writes `td_54point.csv` + `td_grids.json`. No "Save" button to forget. |
-| ⬆️&nbsp; **Drop-in upload** | Add subjects from the UI — works for any cohort, not just the original project's. |
+| 🔍&nbsp; **Side-by-side** | Zoomable / pannable / rotatable Humphrey report on the left, editable colour-coded 24-2 grid on the right. |
+| ⌨️&nbsp; **Keyboard-first** | Type a value, hit <kbd>Enter</kbd> to save and jump to the next cell. Sweep all 54 points without touching the mouse. |
+| 💾&nbsp; **Auto-save** | Every edit writes `td_54point.csv` + `td_grids.json` **atomically**. No "Save" button to forget. |
+| ⬆️&nbsp; **Upload / delete** | Add or remove subjects right from the UI — works for any cohort, not just the original project's. |
+| 🧾&nbsp; **Per-subject metadata** | Capture age + sex inline; they flow straight into the CSV. |
 | 🎨&nbsp; **Severity colours** | Cells colour-code as you type: green / yellow / orange / red mirror typical clinical severity bands. |
 | 🐳&nbsp; **One-click deploy** | Render, Fly.io, Railway, or any Docker host. Persistent volume, no database. |
-| 🪶&nbsp; **Python stdlib only** | `pip install` is empty. The whole backend is ~400 lines of `http.server`. |
+| 🪶&nbsp; **Zero dependencies** | `pip install` is empty — pure Python stdlib + hand-written HTML/CSS/JS. No framework, no build step. |
 
 ---
 
@@ -62,8 +64,10 @@ Then click **+ Upload report**, drop in any `{subject}_{OD|OS}.jpg` (or
 
 ![Screenshot](docs/screenshot.png)
 
-*Left: stylised Humphrey report. Right: live editable 24-2 grid. Colour
-bands at the top, status bar at the bottom confirms each auto-save.*
+*Left: the uploaded Humphrey report (zoom / pan / rotate / flip). Right: the
+live editable 24-2 grid, colour-coded by severity, with the auto-save
+indicator below. The UI now ships a clean light clinical theme — the captures
+above predate that redesign and will be refreshed.*
 
 </div>
 
@@ -90,13 +94,14 @@ bands at the top, status bar at the bottom confirms each auto-save.*
 
 | Key | Action |
 | :-- | :-- |
-| <kbd>Click</kbd> | Edit a cell |
-| <kbd>Enter</kbd> | Confirm value |
-| <kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> | Next / previous cell |
-| <kbd>Esc</kbd> | Cancel edit |
+| <kbd>Click</kbd> or just start typing | Edit the focused cell |
+| <kbd>Enter</kbd> | Save and move to the next cell |
+| <kbd>Tab</kbd> / <kbd>Shift+Tab</kbd> | Save and move next / previous |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Save and move to the cell above / below |
+| <kbd>Esc</kbd> | Cancel the current edit |
 | <kbd>←</kbd> / <kbd>→</kbd> | Previous / next subject |
-| Type `BS` | Mark a cell as blind spot |
-| Type `?` or empty | Mark as missing |
+| Type `BS` or `B` | Mark a cell as blind spot |
+| Type `?` or leave empty | Mark as missing |
 | Mouse wheel | Zoom report image |
 | Click-drag | Pan report image |
 
@@ -234,12 +239,13 @@ All via environment variables; nothing is hard-coded.
 
 | | |
 | :--- | :--- |
-| Backend | Python ≥ 3.8 — `http.server`, `email`, `csv`, `json`, `re` (stdlib only) |
+| Backend | Python ≥ 3.8 — `http.server`, `email`, `csv`, `json`, `re`, `threading`, `tempfile` (stdlib only) |
 | Frontend | Hand-written HTML + vanilla JS (no React, no build step, no node_modules) |
-| Persistence | Two files: `td_54point.csv` + `td_grids.json` on a Docker volume |
+| Persistence | Two files: `td_54point.csv` + `td_grids.json`, written atomically on a Docker volume |
 | Container | `python:3.12-slim` + the app — final image ~50 MB |
 
-The whole backend is **~400 lines of Python**. Read it: [`app/server.py`](app/server.py).
+It's a single self-contained file — the Python backend **and** the entire
+embedded UI live in [`app/server.py`](app/server.py).
 
 ---
 
