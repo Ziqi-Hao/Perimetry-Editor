@@ -22,15 +22,16 @@ jobs:
           - os: ubuntu-latest
             asset: PerimetryEditor-Linux
             ext: ""
-          - os: macos-13            # Intel
-            asset: PerimetryEditor-macOS-Intel
-            ext: ""
-          - os: macos-14            # Apple Silicon
+          - os: macos-14            # Apple Silicon (covers Macs from ~2020 on)
             asset: PerimetryEditor-macOS-AppleSilicon
             ext: ""
           - os: windows-latest
             asset: PerimetryEditor-Windows
             ext: ".exe"
+          # macos-13 (Intel) is intentionally omitted: GitHub's Intel macOS
+          # runners are scarce/EOL and queue indefinitely, stalling the run.
+          # Intel-Mac users can "Run from source" (see README). Re-add here if
+          # runner availability improves.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -59,7 +60,9 @@ jobs:
   release:
     name: Publish release
     needs: build
-    if: startsWith(github.ref, 'refs/tags/')
+    # always(): publish whatever binaries succeeded, so one failing platform
+    # can't block the release of the others.
+    if: always() && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -69,4 +72,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: artifacts/**/*
+          fail_on_unmatched_files: false
           generate_release_notes: true
