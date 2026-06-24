@@ -129,31 +129,31 @@ above predate that redesign and will be refreshed.*
 
 ```mermaid
 flowchart LR
-  subgraph Browser["🖥 Browser (single HTML page)"]
-    UI[Zoomable left pane<br/>+ editable right grid]
+  subgraph App["🖥 Desktop app — double-click"]
+    LAUNCH["desktop.py<br/>picks a free port, opens browser"]
+    UI["single HTML page<br/>report pane + editable 24-2 grid"]
   end
   subgraph Server["🐍 server.py · stdlib http.server"]
-    GET_DATA["/api/data"]
-    GET_IMG["/api/image?key=..."]
-    POST_SAVE["/api/autosave"]
-    POST_UP["/api/upload"]
-    HEALTH["/health"]
+    DATA["GET /api/data"]
+    IMGEP["GET /api/image"]
+    SAVE["POST /api/autosave"]
+    UP["POST /api/upload"]
+    DEL["POST /api/delete"]
   end
-  subgraph Disk["💾 $DATA_DIR (Docker volume)"]
-    IMG[images/<br/>{subject}_OD.jpg]
-    CSV[extracted/<br/>td_54point.csv]
-    JSON[extracted/<br/>td_grids.json]
+  subgraph Disk["💾 Data folder — ~/PerimetryEditor (or a Docker volume)"]
+    IMG["images/<br/>{subject}_OD.jpg"]
+    CSV["extracted/<br/>td_54point.csv"]
+    JSON["extracted/<br/>td_grids.json"]
   end
 
-  UI <-->|JSON| GET_DATA
-  UI -->|GET| GET_IMG
-  GET_IMG --> IMG
-  UI -->|POST every edit| POST_SAVE
-  POST_SAVE --> CSV
-  POST_SAVE --> JSON
-  UI -->|multipart| POST_UP
-  POST_UP --> IMG
-  Server -->|"on startup"| JSON
+  LAUNCH --> UI
+  UI <-->|JSON| DATA
+  UI -->|GET| IMGEP --> IMG
+  UI -->|POST every edit| SAVE --> CSV
+  SAVE --> JSON
+  UI -->|multipart upload| UP --> IMG
+  UI -->|remove subject| DEL --> JSON
+  Server -->|load on startup| JSON
 ```
 
 Three moving parts. No database, no JS framework, no build step.
