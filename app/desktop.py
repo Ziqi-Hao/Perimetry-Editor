@@ -38,6 +38,14 @@ def pick_port(preferred=8766):
 
 
 def main():
+    # Windows consoles often default to cp1252; make sure printing the banner
+    # (or a data path with non-ASCII characters) can never crash the app.
+    for _stream in (sys.stdout, sys.stderr):
+        try:
+            _stream.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
     # Set the data folder BEFORE importing the server, which reads it at import.
     os.environ.setdefault("DATA_DIR", default_data_dir())
 
@@ -57,12 +65,12 @@ def main():
 
     print(
         "\n"
-        "  ┌──────────────────────────────────────────────┐\n"
-        "  │   Perimetry Editor — HFA 24-2 Total Deviation  │\n"
-        "  └──────────────────────────────────────────────┘\n"
+        "  ==================================================\n"
+        "    Perimetry Editor - HFA 24-2 Total Deviation\n"
+        "  ==================================================\n"
         f"  Open in browser : {url}\n"
         f"  Your data folder: {os.environ['DATA_DIR']}\n"
-        "  (uploaded reports + edits are saved there: images/ and extracted/)\n"
+        "  (uploaded reports + edits are saved here: images/ and extracted/)\n"
         "\n"
         "  Leave this window open while you work. Close it to quit.\n",
         flush=True,

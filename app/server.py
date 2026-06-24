@@ -54,7 +54,7 @@ from hvf_24_2 import (
     get_vf_x, eccentricity, quadrant_anatomical,
 )
 
-VERSION     = "1.0.2"
+VERSION     = "1.0.3"
 DATA_DIR    = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 IMAGES_DIR  = os.path.join(DATA_DIR, "images")
 OUT_DIR     = os.path.join(DATA_DIR, "extracted")
