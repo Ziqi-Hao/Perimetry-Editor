@@ -1,0 +1,72 @@
+name: Build desktop apps
+
+# Push a version tag (e.g. `git tag v1.0.0 && git push origin v1.0.0`) to build
+# all platforms and publish them to a GitHub Release. Use the "Run workflow"
+# button (workflow_dispatch) to test a build without cutting a release.
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.asset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            asset: PerimetryEditor-Linux
+            ext: ""
+          - os: macos-13            # Intel
+            asset: PerimetryEditor-macOS-Intel
+            ext: ""
+          - os: macos-14            # Apple Silicon
+            asset: PerimetryEditor-macOS-AppleSilicon
+            ext: ""
+          - os: windows-latest
+            asset: PerimetryEditor-Windows
+            ext: ".exe"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PyInstaller
+        run: python -m pip install --upgrade pip pyinstaller
+      - name: Build single-file executable
+        run: >
+          pyinstaller --onefile --name PerimetryEditor
+          --paths app --hidden-import server --hidden-import hvf_24_2
+          --console --clean --noconfirm app/desktop.py
+      - name: Smoke-test the built binary
+        shell: bash
+        run: python tools/smoke_test.py "dist/PerimetryEditor${{ matrix.ext }}"
+      - name: Stage artifact
+        shell: bash
+        run: |
+          mkdir -p out
+          cp "dist/PerimetryEditor${{ matrix.ext }}" "out/${{ matrix.asset }}${{ matrix.ext }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.asset }}
+          path: out/*
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true

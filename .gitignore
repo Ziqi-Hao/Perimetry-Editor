@@ -10,3 +10,11 @@ __pycache__/
 *.swp
 .DS_Store
 .env
+
+# PyInstaller build output
+build/
+dist/
+*.spec
+
+# Local Fly.io config copied from deploy/ during `fly launch`
+/fly.toml

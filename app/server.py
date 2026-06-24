@@ -38,7 +38,9 @@ import http.server
 import io
 import json
 import os
+import platform
 import re
+import subprocess
 import sys
 import tempfile
 import threading
@@ -52,6 +54,7 @@ from hvf_24_2 import (
     get_vf_x, eccentricity, quadrant_anatomical,
 )
 
+VERSION     = "1.0.0"
 DATA_DIR    = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 IMAGES_DIR  = os.path.join(DATA_DIR, "images")
 OUT_DIR     = os.path.join(DATA_DIR, "extracted")
@@ -462,6 +465,7 @@ table.g td input{
   <div class="actions">
     <button class="btn icon" onclick="prev()" id="pb" title="Previous subject (←)">‹</button>
     <button class="btn icon" onclick="next()" id="nb" title="Next subject (→)">›</button>
+    <button class="btn" onclick="reveal()" id="folderBtn" title="Open the folder where your data is saved">📁 Data folder</button>
     <button class="btn primary" onclick="openUpload()">＋ Upload report</button>
   </div>
 </div>
@@ -604,7 +608,21 @@ function init(){
   $('ageIn').onchange=()=>{if(D[ck]){D[ck].age=$('ageIn').value.trim();saveDoc()}};
   $('sexIn').onchange=()=>{if(D[ck]){D[ck].sex=$('sexIn').value.trim();saveDoc()}};
   $('uploadModal').onclick=e=>{if(e.target.id==='uploadModal')closeUpload()};
+  fetchInfo();
   refresh();
+}
+
+function fetchInfo(){
+  fetch('/api/info').then(r=>r.json()).then(i=>{
+    const b=$('folderBtn');
+    if(b&&i.data_dir)b.title='Open the folder where your data is saved:\n'+i.data_dir;
+  }).catch(()=>{});
+}
+function reveal(){
+  fetch('/api/reveal',{method:'POST'}).then(r=>r.json()).then(res=>{
+    if(res.ok)setStatus('Opened data folder');
+    else setStatus('Could not open folder: '+res.error,'error');
+  }).catch(e=>setStatus('Could not open folder: '+e,'error'));
 }
 
 function filledCount(rows){let c=0;for(const r of rows)for(const v of r)if(v!==null&&v!==undefined)c++;return c}
@@ -833,6 +851,23 @@ init();
 </body></html>"""
 
 
+# ───────────────────────── desktop helpers ───────────────────────────
+def open_in_file_manager(path):
+    """Reveal ``path`` in the OS file manager (used by the desktop build)."""
+    system = platform.system()
+    if system == "Windows":
+        os.startfile(path)            # type: ignore[attr-defined]
+    elif system == "Darwin":
+        subprocess.Popen(["open", path])
+    else:
+        subprocess.Popen(["xdg-open", path])
+
+
+def build_server(host, port):
+    """Construct the threaded HTTP server (shared by CLI + desktop launcher)."""
+    return http.server.ThreadingHTTPServer((host, port), Handler)
+
+
 # ───────────────────────── HTTP server ───────────────────────────
 class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, fmt, *args):
@@ -860,6 +895,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     self._respond(200, ct, f.read())
                 return
             self._respond(404, "text/plain", b"image not found")
+        elif parsed.path == "/api/info":
+            info = {
+                "data_dir": DATA_DIR,
+                "version": VERSION,
+                "frozen": bool(getattr(sys, "frozen", False)),
+            }
+            self._respond(200, "application/json", json.dumps(info).encode())
         elif parsed.path == "/health":
             self._respond(200, "text/plain", b"ok")
         else:
@@ -873,8 +915,19 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self._handle_delete()
         elif self.path == "/api/upload":
             self._handle_upload()
+        elif self.path == "/api/reveal":
+            self._handle_reveal()
         else:
             self._respond(404, "text/plain", b"not found")
+
+    def _handle_reveal(self):
+        try:
+            _ensure_dirs()
+            open_in_file_manager(DATA_DIR)
+            self._respond(200, "application/json", json.dumps({"ok": True}).encode())
+        except Exception as e:
+            self._respond(500, "application/json",
+                          json.dumps({"ok": False, "error": str(e)}).encode())
 
     def _read_json_body(self):
         length = int(self.headers.get("Content-Length", 0) or 0)
@@ -1015,7 +1068,7 @@ def main():
     print(f"             {OUT_JSON}")
     print(f"  Ctrl+C to stop.")
 
-    server = http.server.ThreadingHTTPServer((args.host, args.port), Handler)
+    server = build_server(args.host, args.port)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

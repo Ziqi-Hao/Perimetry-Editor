@@ -40,13 +40,31 @@ instead of ~10 min.
 
 ---
 
-## 🚀 Quick start
+## ⬇️ Download & run (no Python needed)
+
+Grab the one-file app for your OS from the
+[**latest release**](https://github.com/Ziqi-Hao/Perimetry-Editor/releases/latest)
+and double-click it. It opens the editor in your browser and saves everything
+to a `PerimetryEditor/` folder in your home directory — no install, no Python,
+no terminal commands.
+
+| OS | File | First-launch note |
+| :-- | :-- | :-- |
+| **Windows** | `PerimetryEditor-Windows.exe` | SmartScreen may warn → **More info → Run anyway** |
+| **macOS (Apple Silicon)** | `PerimetryEditor-macOS-AppleSilicon` | Unsigned → **right-click → Open** the first time |
+| **macOS (Intel)** | `PerimetryEditor-macOS-Intel` | same as above |
+| **Linux** | `PerimetryEditor-Linux` | `chmod +x PerimetryEditor-Linux` then run it |
+
+A small console window stays open while the app runs — **close it to quit**.
+Click **📁 Data folder** in the app to jump straight to your saved CSV.
+
+## 🚀 Run from source
 
 ```bash
 git clone https://github.com/Ziqi-Hao/Perimetry-Editor.git
 cd Perimetry-Editor
-python3 app/server.py
-# → http://localhost:8766
+python3 app/desktop.py     # desktop mode: picks a free port + opens your browser
+# …or `python3 app/server.py` for plain server mode on :8766
 ```
 
 Then click **+ Upload report**, drop in any `{subject}_{OD|OS}.jpg` (or
@@ -163,6 +181,22 @@ patient_007,OD,,,4,8,21,-3,21.21,IT,-4
 | `td_dB` | Cell value: integer dB, the literal `BS`, or empty if still missing |
 
 ---
+
+## 🔨 Build the executable yourself
+
+```bash
+pip install -r requirements-dev.txt    # build tooling only (PyInstaller)
+./build.sh                             # → dist/PerimetryEditor
+```
+
+Pushing a version tag also builds **Windows + macOS + Linux** binaries on
+GitHub Actions, smoke-tests each one, and attaches them to a release:
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
+
+See [`.github/workflows/build.yml`](.github/workflows/build.yml).
 
 ## ☁️ Deploy
 

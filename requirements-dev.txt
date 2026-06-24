@@ -1,0 +1,4 @@
+# Build-time tooling ONLY — not needed to run the app.
+# The app itself is pure Python stdlib; this just packages it into a
+# single double-click executable. Install with:  pip install -r requirements-dev.txt
+pyinstaller>=6.0
