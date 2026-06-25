@@ -54,7 +54,7 @@ from hvf_24_2 import (
     get_vf_x, eccentricity, quadrant_anatomical,
 )
 
-VERSION     = "1.0.3"
+VERSION     = "1.0.4"
 DATA_DIR    = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 IMAGES_DIR  = os.path.join(DATA_DIR, "images")
 OUT_DIR     = os.path.join(DATA_DIR, "extracted")
@@ -368,6 +368,15 @@ button,input,select{font-family:inherit}
 .legend .chip.bs .dot{background:#94a3b8}
 .legend .chip.missing{background:var(--panel-2);color:var(--ink-3);border:1px dashed var(--line-2)}
 
+/* severity scale + plot framing */
+.scale-row{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}
+.scale{display:flex;flex-direction:column;gap:6px;flex:1;min-width:200px}
+.scale .segs{display:flex;justify-content:space-between;font-size:9px;font-weight:700;color:var(--ink-2);text-transform:uppercase;letter-spacing:.03em}
+.scale .bar{height:14px;border-radius:7px;border:1px solid var(--line-2);background:linear-gradient(90deg,var(--s-bg),var(--o-bg) 34%,var(--m-bg) 66%,var(--n-bg))}
+.scale .ticks{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink-3);font-family:var(--font-mono)}
+.plotcol{display:flex;flex-direction:column;align-items:center;gap:9px}
+.orient{font-size:9.5px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.16em}
+
 /* the actual grid */
 .gridwrap{display:flex;justify-content:center;align-items:center;flex:1;padding:6px 0}
 table.g{border-collapse:separate;border-spacing:5px}
@@ -531,16 +540,19 @@ table.g td input{
         </div>
       </div>
 
-      <div class="legend">
-        <span class="chip normal"><span class="dot"></span>≥ 0</span>
-        <span class="chip borderline"><span class="dot"></span>−5 to −1</span>
-        <span class="chip moderate"><span class="dot"></span>−15 to −6</span>
-        <span class="chip severe"><span class="dot"></span>&lt; −15</span>
-        <span class="chip bs"><span class="dot"></span>BS</span>
-        <span class="chip missing">?</span>
+      <div class="scale-row">
+        <div class="scale">
+          <div class="segs"><span>Severe</span><span>Moderate</span><span>Borderline</span><span>Normal</span></div>
+          <div class="bar"></div>
+          <div class="ticks"><span>&lt;−15</span><span>−15</span><span>−6</span><span>−1</span><span>≥0</span></div>
+        </div>
+        <div class="legend" style="flex-wrap:nowrap">
+          <span class="chip bs"><span class="dot"></span>BS</span>
+          <span class="chip missing">?</span>
+        </div>
       </div>
 
-      <div class="gridwrap"><table class="g" id="gt"></table></div>
+      <div class="gridwrap"><div class="plotcol"><div class="orient">Superior</div><table class="g" id="gt"></table><div class="orient">Inferior</div></div></div>
 
       <div class="tip">
         <div class="row">
