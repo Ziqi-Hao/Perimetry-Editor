@@ -189,7 +189,7 @@ HTML_PAGE = r"""<!DOCTYPE html>
 <title>Perimetry Editor — HFA 24-2 Total Deviation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   /* clean clinical light palette */
@@ -211,20 +211,22 @@ HTML_PAGE = r"""<!DOCTYPE html>
   --o-bg:#ffe2cc;  --o-bd:#fbb277;  --o-ink:#9a3d10;
   --s-bg:#fcdcdc;  --s-bd:#f3a3a3;  --s-ink:#9b1c1c;
   --bs-bg:#eef1f5; --bs-ink:#64748b;
-  --shadow:0 1px 2px rgba(15,23,42,.04),0 8px 24px -12px rgba(15,23,42,.18);
+  --shadow:0 1px 2px rgba(15,23,42,.05),0 12px 30px -14px rgba(15,23,42,.22);
   --shadow-sm:0 1px 2px rgba(15,23,42,.06);
   --ease:cubic-bezier(.22,.61,.36,1);
+  --font-ui:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,'SFMono-Regular',monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
 body{
-  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto',sans-serif;
-  background:var(--bg);color:var(--ink);
+  font-family:var(--font-ui);
+  background:radial-gradient(1200px 620px at 100% -12%,rgba(29,111,224,.06),transparent 60%),var(--bg);color:var(--ink);
   -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
   letter-spacing:-.005em;
 }
 button,input,select{font-family:inherit}
-.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-feature-settings:'tnum'}
+.mono{font-family:var(--font-mono);font-feature-settings:'tnum'}
 
 /* ─── top bar ─── */
 .topbar{
@@ -296,7 +298,7 @@ button,input,select{font-family:inherit}
 .subjects li:hover .del{display:grid}
 .del:hover{background:#fdeaea;color:#dc2626}
 .sidebar .foot{padding:11px 14px;border-top:1px solid var(--line);font-size:11px;color:var(--ink-3);display:flex;justify-content:space-between}
-.kbd{display:inline-flex;align-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;padding:2px 6px;border-radius:5px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--ink-2);margin:0 1px}
+.kbd{display:inline-flex;align-items:center;font-family:var(--font-mono);font-size:10px;font-weight:600;padding:2px 6px;border-radius:5px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--ink-2);margin:0 1px}
 
 /* ─── main area ─── */
 .main{display:grid;grid-template-columns:1fr 470px;height:100%;overflow:hidden;gap:16px;padding:16px}
@@ -370,13 +372,14 @@ button,input,select{font-family:inherit}
 .gridwrap{display:flex;justify-content:center;align-items:center;flex:1;padding:6px 0}
 table.g{border-collapse:separate;border-spacing:5px}
 table.g td{
-  width:44px;height:38px;text-align:center;border-radius:10px;cursor:pointer;
-  font-family:'JetBrains Mono',ui-monospace,monospace;font-size:14px;font-weight:700;
+  width:42px;height:42px;text-align:center;border-radius:50%;cursor:pointer;
+  font-family:var(--font-mono);font-size:14px;font-weight:700;
   font-feature-settings:'tnum';border:1px solid transparent;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.45);
   transition:transform .1s var(--ease),box-shadow .1s var(--ease),filter .1s;position:relative;
 }
 table.g td:not(.e):hover{transform:translateY(-1px);filter:brightness(.97);z-index:5;box-shadow:var(--shadow-sm)}
-table.g td.e{background:transparent !important;border-color:transparent !important;cursor:default}
+table.g td.e{background:transparent !important;border-color:transparent !important;box-shadow:none !important;cursor:default}
 table.g td.e:hover{transform:none;filter:none;box-shadow:none}
 table.g td.focus{outline:2.5px solid var(--brand);outline-offset:1px;box-shadow:0 0 0 4px var(--focus);z-index:6}
 table.g td input{
