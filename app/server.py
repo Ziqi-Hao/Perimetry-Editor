@@ -54,7 +54,7 @@ from hvf_24_2 import (
     get_vf_x, eccentricity, quadrant_anatomical,
 )
 
-VERSION     = "1.0.4"
+VERSION     = "1.0.5"
 DATA_DIR    = os.environ.get("DATA_DIR", os.path.join(os.getcwd(), "data"))
 IMAGES_DIR  = os.path.join(DATA_DIR, "images")
 OUT_DIR     = os.path.join(DATA_DIR, "extracted")
@@ -598,11 +598,10 @@ table.g td input{
 
 <script>
 "use strict";
-// 24-2 row widths and the shared padding used for BOTH rendering and navigation
-// (OD padding aligns each point to its true x-position; OS is centred).
+// 24-2 row widths. OD_PAD left-pads each row so points sit at their true
+// x-position — temporal on the right, like a right-eye Humphrey printout.
 const RS=[4,6,8,9,9,8,6,4], MC=9, BSR=4, BSC=7;
 const OD_PAD=[3,2,1,0,0,1,2,3];
-const OS_PAD=[2,1,0,0,0,0,1,2];
 const TOTAL=RS.reduce((a,b)=>a+b,0);   // 54
 
 let D={}, ck="", ci=0, ks=[];
@@ -610,7 +609,12 @@ let sc=1, sx=0, sy=0, drag=false, dsx, dsy, dix, diy, imgRot=0, imgFlipH=false;
 let focusCell={r:0,c:0};
 
 const $=id=>document.getElementById(id);
-function padFor(eye){return eye==='OS'?OS_PAD:OD_PAD;}
+// Screen column <-> data index. di -> x_vf is fixed; only the on-screen column
+// changes. OS is mirrored horizontally so temporal sits on the LEFT, matching a
+// left-eye Humphrey printout.
+function eyeNow(){return D[ck]?.eye||'OD';}
+function colOf(eye,r,di){return eye==='OS'?OD_PAD[r]+(RS[r]-1-di):OD_PAD[r]+di;}
+function diAt(eye,r,gc){const k=gc-OD_PAD[r];return eye==='OS'?RS[r]-1-k:k;}
 
 function init(){
   const p=$('ip');
@@ -723,11 +727,11 @@ function disp(v){if(v===null||v===undefined)return'?';if(v==='BS')return'BS';ret
 
 function buildGrid(){
   const t=$('gt');t.innerHTML='';
-  const eye=D[ck]?.eye||'OD',pad=padFor(eye);
+  const eye=eyeNow();
   for(let r=0;r<8;r++){
-    const tr=document.createElement('tr'),nc=RS[r],pl=pad[r];
+    const tr=document.createElement('tr'),nc=RS[r];
     for(let gc=0;gc<MC;gc++){
-      const td=document.createElement('td'),di=gc-pl;
+      const td=document.createElement('td'),di=diAt(eye,r,gc);
       if(di<0||di>=nc){td.className='e';tr.appendChild(td);continue}
       const v=D[ck].rows[r]&&D[ck].rows[r][di]!==undefined?D[ck].rows[r][di]:null;
       td.className=sev(v);td.textContent=disp(v);
@@ -742,9 +746,9 @@ function buildGrid(){
 }
 
 function cellAt(r,di){
-  const eye=D[ck]?.eye||'OD',pad=padFor(eye),t=$('gt');
+  const eye=eyeNow(),t=$('gt');
   if(r<0||r>=8||di<0||di>=RS[r])return null;
-  return t.rows[r]?.cells[di+pad[r]]||null;
+  return t.rows[r]?.cells[colOf(eye,r,di)]||null;
 }
 function paintFocus(){
   document.querySelectorAll('table.g td.focus').forEach(td=>td.classList.remove('focus'));
@@ -754,13 +758,30 @@ function paintFocus(){
 
 // next data cell in a direction; returns {r,c} or null
 function moveFrom(r,di,dir){
-  if(dir==='next'){di++;if(di>=RS[r]){r++;di=0}if(r>=8)return null;return{r,c:di}}
-  if(dir==='prev'){di--;if(di<0){r--;if(r<0)return null;di=RS[r]-1}return{r,c:di}}
+  const eye=eyeNow(),gc=colOf(eye,r,di);
+  if(dir==='next'||dir==='prev'){
+    const step=dir==='next'?1:-1;
+    let cr=r,cc=gc+step;
+    for(let g=0;g<256;g++){
+      if(cc<0){if(--cr<0)return null;cc=MC-1;continue}
+      if(cc>=MC){if(++cr>=8)return null;cc=0;continue}
+      const d=diAt(eye,cr,cc);
+      if(d>=0&&d<RS[cr])return{r:cr,c:d};
+      cc+=step;
+    }
+    return null;
+  }
   if(dir==='down'||dir==='up'){
-    const eye=D[ck]?.eye||'OD',pad=padFor(eye),gc=pad[r]+di,nr=r+(dir==='down'?1:-1);
+    const nr=r+(dir==='down'?1:-1);
     if(nr<0||nr>=8)return null;
-    const ndi=Math.max(0,Math.min(RS[nr]-1,gc-pad[nr]));
-    return{r:nr,c:ndi};
+    for(let off=0;off<MC;off++){
+      for(const c of [gc-off,gc+off]){
+        if(c<0||c>=MC)continue;
+        const d=diAt(eye,nr,c);
+        if(d>=0&&d<RS[nr])return{r:nr,c:d};
+      }
+    }
+    return null;
   }
   return null;
 }
