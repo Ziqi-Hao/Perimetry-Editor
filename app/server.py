@@ -375,7 +375,9 @@ button,input,select{font-family:inherit}
 .scale .bar{height:14px;border-radius:7px;border:1px solid var(--line-2);background:linear-gradient(90deg,var(--s-bg),var(--o-bg) 34%,var(--m-bg) 66%,var(--n-bg))}
 .scale .ticks{display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink-3);font-family:var(--font-mono)}
 .plotcol{display:flex;flex-direction:column;align-items:center;gap:9px}
+.plotframe{display:flex;align-items:center;gap:9px}
 .orient{font-size:9.5px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.16em}
+.orient.hlab{writing-mode:vertical-rl}
 
 /* the actual grid */
 .gridwrap{display:flex;justify-content:center;align-items:center;flex:1;padding:6px 0}
@@ -552,7 +554,7 @@ table.g td input{
         </div>
       </div>
 
-      <div class="gridwrap"><div class="plotcol"><div class="orient">Superior</div><table class="g" id="gt"></table><div class="orient">Inferior</div></div></div>
+      <div class="gridwrap"><div class="plotframe"><div class="orient hlab">Nasal</div><div class="plotcol"><div class="orient">Superior</div><table class="g" id="gt"></table><div class="orient">Inferior</div></div><div class="orient hlab">Temporal</div></div></div>
 
       <div class="tip">
         <div class="row">

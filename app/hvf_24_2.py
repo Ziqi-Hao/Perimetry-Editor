@@ -2,13 +2,13 @@
 
 The 24-2 pattern tests 54 points on a 6° grid centred on fixation.
 
-Printout vs visual-field coordinate convention:
-  The Humphrey printout puts temporal on the left for BOTH eyes.
-  In visual-field coordinates:
-    x > 0 = right VF (nasal for OD, temporal for OS)
-    x < 0 = left VF  (temporal for OD, nasal for OS)
-    y > 0 = superior VF
-  For OS, the printout x must be NEGATED to get the VF x.
+Visual-field coordinate convention (used in the CSV):
+    x > 0 = right hemifield (temporal for OD, nasal for OS)
+    x < 0 = left  hemifield (nasal for OD, temporal for OS)
+    y > 0 = superior
+  The physiological blind spot (~15 deg temporal, just below the horizontal)
+  therefore sits at x = +15, y = -3 for OD -> inferior-temporal (IT).
+  For OS, the printout x is NEGATED to get the VF x.
 """
 import math
 
@@ -44,7 +44,7 @@ def get_vf_x(printout_x, eye):
 def quadrant_anatomical(vf_x, y, eye):
     v = "S" if y >= 0 else "I"
     if eye == "OD":
-        h = "N" if vf_x > 0 else "T"
+        h = "T" if vf_x > 0 else "N"
     else:
-        h = "N" if vf_x < 0 else "T"
+        h = "T" if vf_x < 0 else "N"
     return v + h
