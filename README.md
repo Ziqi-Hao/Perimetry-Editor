@@ -69,42 +69,6 @@ data folder. The CSV is the canonical artifact — one row per tested point:
 | `quadrant` | anatomical quadrant (`SN`/`ST`/`IN`/`IT`) |
 | `td_dB` | value in dB, the literal `BS`, or empty |
 
-## How it works
-
-```mermaid
-flowchart LR
-  subgraph App["🖥 Desktop app — double-click"]
-    LAUNCH["desktop.py<br/>picks a free port, opens browser"]
-    UI["single HTML page<br/>report pane + editable 24-2 grid"]
-  end
-  subgraph Server["🐍 server.py · stdlib http.server"]
-    DATA["GET /api/data"]
-    IMGEP["GET /api/image"]
-    SAVE["POST /api/autosave"]
-    UP["POST /api/upload"]
-    DEL["POST /api/delete"]
-  end
-  subgraph Disk["💾 Data folder — ~/PerimetryEditor"]
-    IMG["images/<br/>{subject}_OD.jpg"]
-    CSV["extracted/<br/>td_54point.csv"]
-    JSON["extracted/<br/>td_grids.json"]
-  end
-
-  LAUNCH --> UI
-  UI <-->|JSON| DATA
-  UI -->|GET| IMGEP --> IMG
-  UI -->|POST every edit| SAVE --> CSV
-  SAVE --> JSON
-  UI -->|multipart upload| UP --> IMG
-  UI -->|remove subject| DEL --> JSON
-```
-
-Three small files, no database, no framework, no build step:
-
-- `app/desktop.py` — launcher: picks a port, opens the browser, keeps data in `~/PerimetryEditor`
-- `app/server.py` — `http.server` backend **plus the entire UI** (HTML/CSS/JS embedded)
-- `app/hvf_24_2.py` — 24-2 grid geometry
-
 ## Build the executables
 
 ```bash
