@@ -12,21 +12,37 @@ Python, no cloud.
 ## Download
 
 Grab the app for your OS from the
-[**latest release**](https://github.com/Ziqi-Hao/Perimetry-Editor/releases/latest)
-and double-click it:
+[**latest release**](https://github.com/Ziqi-Hao/Perimetry-Editor/releases/latest).
+It's a small command-line program that **opens the editor in your web browser**
+and saves everything to a `PerimetryEditor/` folder in your home directory
+(click **📁 Data folder** in the app to find your CSV).
 
-| OS | File | First launch |
-| :-- | :-- | :-- |
-| **Windows** | `PerimetryEditor-Windows.exe` | SmartScreen → **More info → Run anyway** |
-| **macOS** (Apple Silicon) | `PerimetryEditor-macOS-AppleSilicon` | **Right-click → Open** (unsigned) |
-| **Linux** | `PerimetryEditor-Linux` | `chmod +x PerimetryEditor-Linux`, then run |
+The app is free and **unsigned**, so your OS warns on first launch — here's how
+to get past it on each platform:
 
-It opens in your browser and saves everything to a `PerimetryEditor/` folder in
-your home directory. Click **📁 Data folder** in the app to find your CSV.
-A small console window stays open while it runs — close it to quit.
+**Windows** — `PerimetryEditor-Windows.exe`
+Double-click → on the blue *"Windows protected your PC"* prompt click
+**More info → Run anyway**. A small console window opens (that's the app
+running); the editor is in your browser. Close the console window to quit.
+
+**macOS (Apple Silicon)** — `PerimetryEditor-macOS-AppleSilicon`
+It's a command-line binary, so run it from **Terminal** (not double-click):
+```bash
+cd ~/Downloads                                       # wherever you saved it
+chmod +x PerimetryEditor-macOS-AppleSilicon          # add run permission (downloads lose it)
+xattr -dr com.apple.quarantine PerimetryEditor-macOS-AppleSilicon   # clear Gatekeeper flag
+./PerimetryEditor-macOS-AppleSilicon                 # run — your browser opens
+```
+Quit with **Ctrl+C** in the Terminal.
+
+**Linux** — `PerimetryEditor-Linux`
+```bash
+chmod +x PerimetryEditor-Linux && ./PerimetryEditor-Linux
+```
 
 > Runs entirely on your machine — nothing is uploaded. Use coded subject IDs,
-> not patient names.
+> not patient names. **Want to skip the security prompts entirely?** Run from
+> source (below) — `python3 app/desktop.py`, no binary, no warnings.
 
 ## Run from source
 
