@@ -5,6 +5,10 @@ perimetry data.** Open the report image on the left, fix the OCR-extracted
 numbers on the right — every edit auto-saves to a clean CSV. No install, no
 Python, no cloud.
 
+<p align="center">
+  <img src="docs/screenshot.png" alt="Perimetry Editor: the uploaded Humphrey report on the left, the editable colour-coded 24-2 Total Deviation grid on the right" width="100%">
+</p>
+
 ## Download
 
 Grab the app for your OS from the
